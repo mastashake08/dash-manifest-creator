@@ -1,4 +1,4 @@
-import { MPD } from 'classes/MPD'
+import { MPD } from './classes/MPD'
 
 export {
   MPD
