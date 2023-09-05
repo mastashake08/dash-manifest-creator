@@ -82,13 +82,13 @@ export class MPD {
 
   downloadXML () {
     const blob = this.getBlob()
-    saveAs(blob, 'playlist.mpd')
+    saveAs(blob, 'dash.mpd')
   }
 
   getBlob () {
     const xml = new XMLSerializer()
     const str = xml.serializeToString(this.mpd)
-    const file = new File([this.mpd], "dash.mpd", {
+    const file = new Blob([str], {
       type: "text/xml",
     })
     return file
