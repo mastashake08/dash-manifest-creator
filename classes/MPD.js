@@ -21,16 +21,15 @@
 </MPD>
 */
 import { saveAs } from 'file-saver'
-export class MPD {
-  constructor (videoData = null) {
-    this.doc = document.implementation.createDocument("", "", null)
-    this.mpd = null
+class MPD {
+  constructor (videoData = null, doc) {
     this.video = videoData
+    this.doc = doc
+    this.mpd = doc.createElement('MPD')
   }
 
-  createMpd (videoData = this.video, mediaUrl = '', startNumber = "1") {
+  createMpd (videoData = this.video, mediaUrl = '') {
     const date = new Date(Date.now()).toISOString()
-    this.mpd = this.doc.createElement('MPD')
     this.mpd.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
     this.mpd.setAttribute('xmlns', 'urn:mpeg:dash:schema:mpd:2011')
     this.mpd.setAttribute('xsi:schemaLocation', 'urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd')
@@ -42,8 +41,8 @@ export class MPD {
     const period = this.createPeriod(this.mpd)
     const as = this.createAdaptationSet(period)
     const cc = this.createContentComponent(as)
-    const st = this.createSegmentTemplate(as, "1000", "2000", startNumber, videoData, mediaUrl)
-
+    const st = this.createSegmentTemplate(as, "1000", "2000", "1", videoData, mediaUrl)
+    return this.doc
   }
 
   createPeriod (el) {
@@ -89,8 +88,11 @@ export class MPD {
     const xml = new XMLSerializer()
     const str = xml.serializeToString(this.mpd)
     const file = new Blob([str], {
-      type: "text/xml",
+      type: "application/xml",
     })
     return file
   }
+}
+export {
+  MPD
 }
