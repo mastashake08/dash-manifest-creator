@@ -20,12 +20,13 @@
   </Period>
 </MPD>
 */
-
+import { saveAs } from 'file-saver'
 export default class MPD {
   constructor (videoData = null) {
     doc = document.implementation.createDocument("", "", null)
     video = videoData
   }
+
   createMpd (videoData = this.video) {
     const date = Date.now()
     const mpd = this.doc.createElement('MPD')
@@ -39,14 +40,14 @@ export default class MPD {
     mpd.setAttribute('availabilityStartTime', date.toISOString())
     const period = createPeriod('MPD')
     const as = createAdaptationSet(period)
-    const cc = createContentComponent(period)
-    const st = createSegmentTemplate(period, 1000, 2000, 1, videoData, '')
+    const cc = createContentComponent(as)
+    const st = createSegmentTemplate(as, "1000", "2000", "", videoData, '')
   }
 
   createPeriod (el) {
     const period = el.createElement('Period')
     period.setAttribute('start', 'PT0S')
-    period.setAttribute('id', 1)
+    period.setAttribute('id', "1")
     return period
   }
 
@@ -56,8 +57,10 @@ export default class MPD {
     return as
   }
 
-  createContentComponent (el) {
+  createContentComponent (el, contentType = 'video', id = 1) {
     const cc = el.createElement('ContentComponent')
+    cc.setAttribute('contentType', contentType)
+    cc.setAttribute('id', id)
     return cc
   }
 
@@ -69,6 +72,10 @@ export default class MPD {
     st.setAttribute('initialization', btoa(videoData))
     st.setAttribute('media', media)
     return cc
+  }
 
+  downloadXML () {
+    var blob = new Blob([this.doc], {type: "text/xml"});
+    saveAs(blob, 'playlist.mpd')
   }
 }
