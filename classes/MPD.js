@@ -28,7 +28,7 @@ export class MPD {
     this.video = videoData
   }
 
-  createMpd (videoData = this.video, mediaUrl = '') {
+  createMpd (videoData = this.video, mediaUrl = '', startNumber = "1") {
     const date = new Date(Date.now()).toISOString()
     this.mpd = this.doc.createElement('MPD')
     this.mpd.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
@@ -42,7 +42,7 @@ export class MPD {
     const period = this.createPeriod(this.mpd)
     const as = this.createAdaptationSet(period)
     const cc = this.createContentComponent(as)
-    const st = this.createSegmentTemplate(as, "1000", "2000", "1", videoData, mediaUrl)
+    const st = this.createSegmentTemplate(as, "1000", "2000", startNumber, videoData, mediaUrl)
 
   }
 
