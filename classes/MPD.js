@@ -21,61 +21,76 @@
 </MPD>
 */
 import { saveAs } from 'file-saver'
-export default class MPD {
+export class MPD {
   constructor (videoData = null) {
-    doc = document.implementation.createDocument("", "", null)
-    video = videoData
+    this.doc = document.implementation.createDocument("", "", null)
+    this.mpd = null
+    this.video = videoData
   }
 
-  createMpd (videoData = this.video) {
-    const date = Date.now()
-    const mpd = this.doc.createElement('MPD')
-    mpd.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
-    mpd.setAttribute('xmlns', 'urn:mpeg:dash:schema:mpd:2011')
-    mpd.setAttribute('xsi:schemaLocation', 'urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd')
-    mpd.setAttribute('type', 'dynamic')
-    mpd.setAttribute('profiles', 'urn:mpeg:dash:profile:isoff-live:2011')
-    mpd.setAttribute('minimumUpdatePeriod', 'PT60S')
-    mpd.setAttribute('minBufferTime', 'PT12S')
-    mpd.setAttribute('availabilityStartTime', date.toISOString())
-    const period = createPeriod('MPD')
-    const as = createAdaptationSet(period)
-    const cc = createContentComponent(as)
-    const st = createSegmentTemplate(as, "1000", "2000", "", videoData, '')
+  createMpd (videoData = this.video, mediaUrl = '') {
+    const date = new Date(Date.now()).toISOString()
+    this.mpd = this.doc.createElement('MPD')
+    this.mpd.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
+    this.mpd.setAttribute('xmlns', 'urn:mpeg:dash:schema:mpd:2011')
+    this.mpd.setAttribute('xsi:schemaLocation', 'urn:mpeg:dash:schema:mpd:2011 DASH-MPD.xsd')
+    this.mpd.setAttribute('type', 'dynamic')
+    this.mpd.setAttribute('profiles', 'urn:mpeg:dash:profile:isoff-live:2011')
+    this.mpd.setAttribute('minimumUpdatePeriod', 'PT60S')
+    this.mpd.setAttribute('minBufferTime', 'PT12S')
+    this.mpd.setAttribute('availabilityStartTime', date)
+    const period = this.createPeriod(this.mpd)
+    const as = this.createAdaptationSet(period)
+    const cc = this.createContentComponent(as)
+    const st = this.createSegmentTemplate(as, "1000", "2000", "1", videoData, mediaUrl)
+
   }
 
   createPeriod (el) {
-    const period = el.createElement('Period')
+    const period = this.doc.createElement('Period')
     period.setAttribute('start', 'PT0S')
     period.setAttribute('id', "1")
+    el.appendChild(period)
     return period
   }
 
   createAdaptationSet (el, mimetype = 'video/webm') {
-    const as = el.createElement('AdaptationSet')
+    const as = this.doc.createElement('AdaptationSet')
     as.setAttribute('mimeType', mimetype)
+    el.appendChild(as)
     return as
   }
 
-  createContentComponent (el, contentType = 'video', id = 1) {
-    const cc = el.createElement('ContentComponent')
+  createContentComponent (el, contentType = 'video', id = "1") {
+    const cc = this.doc.createElement('ContentComponent')
     cc.setAttribute('contentType', contentType)
     cc.setAttribute('id', id)
+    el.appendChild(cc)
     return cc
   }
 
-  createSegmentTemplate (el, timescale = 1000, duration = 2000, startNumber = 1, videoData = this.video, media = '') {
-    const st = el.createElement('SegmentTemplate')
+  createSegmentTemplate (el, timescale = "1000", duration = "2000", startNumber = "1", videoData = this.video, media = '') {
+    const st = this.doc.createElement('SegmentTemplate')
     st.setAttribute('timescale', timescale)
     st.setAttribute('duration', duration)
     st.setAttribute('startNumber', startNumber)
-    st.setAttribute('initialization', btoa(videoData))
+    st.setAttribute('initialization', "data:video/mp4;base64,"+btoa(videoData))
     st.setAttribute('media', media)
-    return cc
+    el.appendChild(st)
+    return st
   }
 
   downloadXML () {
-    var blob = new Blob([this.doc], {type: "text/xml"});
+    const blob = this.getBlob()
     saveAs(blob, 'playlist.mpd')
+  }
+
+  getBlob () {
+    const xml = new XMLSerializer()
+    const str = xml.serializeToString(this.mpd)
+    const file = new File([this.mpd], "dash.mpd", {
+      type: "text/xml",
+    })
+    return file
   }
 }
