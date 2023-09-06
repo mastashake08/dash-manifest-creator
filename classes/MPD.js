@@ -69,7 +69,6 @@ class MPD {
   }
 
   createSegmentTemplate (el, timescale = "1000", duration = "2000", startNumber = "1", videoData = this.video, media = '') {
-    console.log('MEDIA:::',decodeURI(media))
     const st = this.doc.createElement('SegmentTemplate')
     st.setAttribute('timescale', timescale)
     st.setAttribute('duration', duration)
@@ -77,7 +76,6 @@ class MPD {
     st.setAttribute('initialization', "data:video/mp4;base64,"+btoa(videoData))
     st.setAttribute('media', media)
     el.appendChild(st)
-    console.log('ST:::', st)
     return st
   }
 
@@ -89,7 +87,6 @@ class MPD {
   getBlob () {
     const xml = new XMLSerializer()
     let str = xml.serializeToString(this.mpd)
-    str = str.replaceAll('&amp;', '&')
     const file = new Blob([str], {
       type: "application/xml",
     })
