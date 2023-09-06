@@ -40,7 +40,7 @@ class MPD {
     this.mpd.setAttribute('availabilityStartTime', date)
     const period = this.createPeriod(this.mpd)
     const as = this.createAdaptationSet(period)
-    const cc = this.createContentComponent(as)
+    //const cc = this.createContentComponent(as)
     const st = this.createSegmentTemplate(as, "1000", "2000", startNumber, videoData, mediaUrl)
     return this.doc
   }
@@ -70,10 +70,8 @@ class MPD {
 
   createSegmentTemplate (el, timescale = "1000", duration = "2000", startNumber = "1", videoData = this.video, media = '') {
     const st = this.doc.createElement('SegmentTemplate')
-    st.setAttribute('timescale', timescale)
-    st.setAttribute('duration', duration)
     st.setAttribute('startNumber', startNumber)
-    st.setAttribute('initialization', "data:video/mp4;base64,"+btoa(videoData))
+    st.setAttribute('initialization', "data:video/webm;base64,"+btoa(videoData))
     st.setAttribute('media', media)
     el.appendChild(st)
     return st
