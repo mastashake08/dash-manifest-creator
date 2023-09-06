@@ -87,7 +87,7 @@ class MPD {
   getBlob () {
     const xml = new XMLSerializer()
     let str = xml.serializeToString(this.mpd)
-    const file = new Blob([str], {
+    const file = new Blob(['<?xml version="1.0" encoding="UTF-8"?>'+str], {
       type: "application/xml",
     })
     return file
