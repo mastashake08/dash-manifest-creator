@@ -28,7 +28,7 @@ class MPD {
     this.mpd = doc.createElement('MPD')
   }
 
-  createMpd (videoData = this.video, mediaUrl = '') {
+  createMpd (videoData = this.video, mediaUrl = '', startNumber = 1) {
     const date = new Date(Date.now()).toISOString()
     this.mpd.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
     this.mpd.setAttribute('xmlns', 'urn:mpeg:dash:schema:mpd:2011')
@@ -41,7 +41,7 @@ class MPD {
     const period = this.createPeriod(this.mpd)
     const as = this.createAdaptationSet(period)
     const cc = this.createContentComponent(as)
-    const st = this.createSegmentTemplate(as, "1000", "2000", "1", videoData, mediaUrl)
+    const st = this.createSegmentTemplate(as, "1000", "2000", startNumber, videoData, mediaUrl)
     return this.doc
   }
 
@@ -69,6 +69,7 @@ class MPD {
   }
 
   createSegmentTemplate (el, timescale = "1000", duration = "2000", startNumber = "1", videoData = this.video, media = '') {
+    console.log('MEDIA:::',decodeURI(media))
     const st = this.doc.createElement('SegmentTemplate')
     st.setAttribute('timescale', timescale)
     st.setAttribute('duration', duration)
@@ -76,6 +77,7 @@ class MPD {
     st.setAttribute('initialization', "data:video/mp4;base64,"+btoa(videoData))
     st.setAttribute('media', media)
     el.appendChild(st)
+    console.log('ST:::', st)
     return st
   }
 
@@ -86,7 +88,8 @@ class MPD {
 
   getBlob () {
     const xml = new XMLSerializer()
-    const str = xml.serializeToString(this.mpd)
+    let str = xml.serializeToString(this.mpd)
+    str = str.replaceAll('&amp;', '&')
     const file = new Blob([str], {
       type: "application/xml",
     })
