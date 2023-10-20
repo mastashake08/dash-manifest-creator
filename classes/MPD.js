@@ -40,13 +40,11 @@ class MPD {
       this.mpd.setAttribute('minBufferTime', 'PT12S')
       this.mpd.setAttribute('availabilityStartTime', date)
       const period = this.createPeriod(this.mpd)
-      const as = this.createAdaptationSet(period)
-      const cc = this.createContentComponent(as)
-      const st = this.createSegmentTemplate(as, "1000", "2000", startNumber, videoData, mediaUrl)
-      console.log(period.next().value)
-      console.log(as.next().value)
-      console.log(cc.next().value)
+      const as = this.createAdaptationSet(period.next().value)
+      const cc = this.createContentComponent(as.next().value)
+      const st = this.createSegmentTemplate(cc.next().value, "1000", "2000", startNumber, videoData, mediaUrl)
       console.log(st.next().value)
+      console.log(this.doc)
       yield this.doc
     }
   }
