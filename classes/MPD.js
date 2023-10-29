@@ -22,14 +22,14 @@
 */
 import { saveAs } from 'file-saver'
 class MPD {
-  constructor (videoData = null, doc) {
-    this.video = videoData
+  constructor (doc) {
     this.doc = doc
     this.mpd = doc.createElement('MPD')
   }
 
-  *createMpd (videoData = this.video, mediaUrl = '', startNumber = 1) {
+  *createMpd (videoData , mediaUrl = '', startNumber = 1) {
     while(true) {
+      console.log('MEDIAURL', mediaUrl)
       const date = new Date(Date.now()).toISOString()
       this.mpd.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance')
       this.mpd.setAttribute('xmlns', 'urn:mpeg:dash:schema:mpd:2011')
@@ -39,13 +39,13 @@ class MPD {
       this.mpd.setAttribute('minimumUpdatePeriod', 'PT60S')
       this.mpd.setAttribute('minBufferTime', 'PT12S')
       this.mpd.setAttribute('availabilityStartTime', date)
-      const period = this.createPeriod(this.mpd)
+      const period = this.createPeriod(this.mpd, 0, startNumber)
       const as = this.createAdaptationSet(period.next().value)
-      const cc = this.createContentComponent(as.next().value)
+      const cc = this.createContentComponent(as.next().value,'video', startNumber)
       const st = this.createSegmentTemplate(cc.next().value, "1000", "2000", startNumber, videoData, mediaUrl)
-      console.log(st.next().value)
-      console.log(this.doc)
-      yield this.doc
+      st.next()
+      console.log('MPD:',this.mpd)
+      yield this.mpd
     }
   }
 
@@ -54,8 +54,7 @@ class MPD {
    * @param {*} el - element that will be appended to
    * @param {*} timeOffset - time offset for start time
    */
-  *createPeriod (el, timeOffset) {
-    let id = 1;
+  *createPeriod (el, timeOffset, id) {
     let time = 0;
     const period = this.doc.createElement('Period')
     while (true) {
@@ -65,8 +64,10 @@ class MPD {
         period.setAttribute('start', `PT${time + timeOffset}S`)
       }
       period.setAttribute('id', id)
-      yield el.appendChild(period)
+      console.log('Period', this.mpd)
       id++;
+      yield el.appendChild(period)
+      
     }
   }
 
@@ -79,24 +80,26 @@ class MPD {
    
   }
 
-  *createContentComponent (el, contentType = 'video') {
-    let id = 1;
+  *createContentComponent (el, contentType = 'video', id) {
+
     while(true) {
+      console.log(id)
       const cc = this.doc.createElement('ContentComponent');
       cc.setAttribute('contentType', contentType);
       cc.setAttribute('id', id);
-      yield el.appendChild(cc);
       id++;
+      yield el.appendChild(cc);
+      
     }
   }
 
   *createSegmentTemplate (el, timescale = "1000", duration = "2000", startNumber = "1", videoData = this.video, media = '') {
     const st = this.doc.createElement('SegmentTemplate')
     st.setAttribute('startNumber', startNumber)
-    st.setAttribute('initialization', "data:video/webm;base64,"+btoa(yield videoData))
+    st.setAttribute('initialization', "data:video/webm;base64,"+btoa(videoData))
     st.setAttribute('media', media)
-    el.appendChild(st)
-    return st
+    const seg = el.appendChild(st)
+    yield seg
   }
 
   downloadXML () {
