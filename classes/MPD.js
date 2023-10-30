@@ -22,8 +22,19 @@
 */
 import { saveAs } from 'file-saver'
 class MPD {
-  constructor (doc) {
-    this.doc = doc
+  constructor ({
+    mediaUrl,
+    startNumber = 1,
+    timeOffset = 0,
+    periodId = 1,
+    minimumUpdatePeriod = 'PT60S',
+    type = 'dynamic',
+    availabilityStartTime = new Date(Date.now()).toUTCString(),
+    profiles = 'urn:mpeg:dash:profile:isoff-live:2011',
+    minBufferTime =  'PT60S',
+    mimetype = 'video/webm'
+  }) {
+    this.doc = document.implementation.createDocument(null, 'mpd')
     this.mpd = doc.createElement('MPD')
   }
 
