@@ -1,0 +1,12 @@
+# These are the supported funding model platforms
+
+github: [mastashake08] # Replace with up to 4 GitHub Sponsors-enabled usernames e.g., [user1, user2]
+patreon: mastashake08 # Replace with a single Patreon username
+open_collective: # Replace with a single Open Collective username
+ko_fi: mastashake08 # Replace with a single Ko-fi username
+tidelift: # Replace with a single Tidelift platform-name/package-name e.g., npm/babel
+community_bridge: # Replace with a single Community Bridge project-name e.g., cloud-foundry
+liberapay: mastashake08 # Replace with a single Liberapay username
+issuehunt: # Replace with a single IssueHunt username
+otechie: # Replace with a single Otechie username
+custom: ['https://cash.me/$mastashake08'] # Replace with up to 4 custom sponsorship URLs e.g., ['link1', 'link2']
